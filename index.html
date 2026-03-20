@@ -1,3 +1,105 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>형님의 독서 노트</title>
+    <style>
+        /* 간단하고 깔끔한 디자인 */
+        body { font-family: sans-serif; background: #f4f4f9; padding: 20px; }
+        .container { max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 10px; shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        input, textarea { width: 100%; margin-bottom: 10px; padding: 10px; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; background: #2c3e50; color: white; border: none; cursor: pointer; }
+        .hidden { display: none; }
+        .book-item { border-bottom: 1px solid #ddd; padding: 10px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="login-section">
+        <h3>🔐 비밀번호를 입력하세요</h3>
+        <input type="password" id="password-input" placeholder="비밀번호">
+        <button onclick="checkPassword()">접속하기</button>
+    </div>
+
+    <div id="main-section" class="hidden">
+        <h3>📚 나의 독서 목록</h3>
+        <input type="text" id="book-title" placeholder="새 책 제목 입력">
+        <button onclick="addBook()">책 추가하기</button>
+        <div id="book-list"></div>
+    </div>
+
+    <div id="detail-section" class="hidden">
+        <h3 id="current-book-name"></h3>
+        <input type="number" id="page-number" placeholder="현재 페이지">
+        <textarea id="book-content" rows="5" placeholder="내용을 입력하세요"></textarea>
+        <button onclick="saveDetail()">저장하기</button>
+        <button onclick="showMain()" style="margin-top:5px; background:#7f8c8d;">뒤로가기</button>
+    </div>
+</div>
+
+<script>
+    const SECRET_PW = "1234"; // 형님이 원하시는 비밀번호로 바꾸세요!
+    let books = JSON.parse(localStorage.getItem('myBooks')) || [];
+    let selectedIndex = null;
+
+    function checkPassword() {
+        if(document.getElementById('password-input').value === SECRET_PW) {
+            document.getElementById('login-section').classList.add('hidden');
+            document.getElementById('main-section').classList.remove('hidden');
+            renderBooks();
+        } else {
+            alert("비밀번호가 틀렸습니다, 형님!");
+        }
+    }
+
+    function addBook() {
+        const title = document.getElementById('book-title').value;
+        if(title) {
+            books.push({title, page: '', content: ''});
+            localStorage.setItem('myBooks', JSON.stringify(books));
+            document.getElementById('book-title').value = '';
+            renderBooks();
+        }
+    }
+
+    function renderBooks() {
+        const list = document.getElementById('book-list');
+        list.innerHTML = '';
+        books.forEach((book, index) => {
+            const div = document.createElement('div');
+            div.className = 'book-item';
+            div.innerText = book.title;
+            div.onclick = () => showDetail(index);
+            list.appendChild(div);
+        });
+    }
+
+    function showDetail(index) {
+        selectedIndex = index;
+        document.getElementById('main-section').classList.add('hidden');
+        document.getElementById('detail-section').classList.remove('hidden');
+        document.getElementById('current-book-name').innerText = books[index].title;
+        document.getElementById('page-number').value = books[index].page;
+        document.getElementById('book-content').value = books[index].content;
+    }
+
+    function saveDetail() {
+        books[selectedIndex].page = document.getElementById('page-number').value;
+        books[selectedIndex].content = document.getElementById('book-content').value;
+        localStorage.setItem('myBooks', JSON.stringify(books));
+        alert("저장되었습니다!");
+    }
+
+    function showMain() {
+        document.getElementById('detail-section').classList.add('hidden');
+        document.getElementById('main-section').classList.remove('hidden');
+    }
+</script>
+</body>
+</html>
+
 <head>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2c3e50">
